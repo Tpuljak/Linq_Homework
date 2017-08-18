@@ -8,7 +8,7 @@ using TheRealDeal.Domain.DTO;
 
 namespace TheRealDeal.Domain.Repositories
 {
-    class ApplicationsRepository
+    public class ApplicationsRepository
     {
         public ApplicationsRepository()
         {
@@ -22,19 +22,25 @@ namespace TheRealDeal.Domain.Repositories
             return _context.Applications.Count(application => application.IsValid && !application.IsSubmitted);
         }
 
-        public int SumOfMoneyRequested()
+        public double SumOfMoneyRequested()
         {
             return _context.Answers
                 .Where(answer => answer.QuestionIndex == "4.1")
-                .Select(answer => int.Parse(answer.Value))
+                .Where(answer => answer.Value != null)
+                .ToList()
+                .Select(answer => double.Parse(answer.Value.Replace(",", "")))
+                .ConvertToDouble()
                 .Sum();
         }
 
-        public int SumOfMoneyNeeded()
+        public double SumOfMoneyNeeded()
         {
             return _context.Answers
                 .Where(answer => answer.QuestionIndex == "4.3")
-                .Select(answer => int.Parse(answer.Value))
+                .Where(answer => answer.Value != null)
+                .ToList()
+                .Select(answer => double.Parse(answer.Value.Replace(",", "")))
+                .ConvertToDouble()
                 .Sum();
         }
 
@@ -42,10 +48,12 @@ namespace TheRealDeal.Domain.Repositories
         {
             var answers = _context.Answers
                             .Where(answer => answer.QuestionIndex == "4.1" || answer.QuestionIndex == "4.3")
-                            .Select(answer => new { QuestionIndex = answer.QuestionIndex, Value = int.Parse(answer.Value) });
+                            .Where(answer => answer.Value != null)
+                            .ToList()
+                            .Select(answer => new { QuestionIndex = answer.QuestionIndex, Value = double.Parse(answer.Value.Replace(",", "")) });
 
-            return answers.Where(answer => answer.QuestionIndex == "4.1").Select(answer => answer.Value).Sum() /
-                   answers.Where(answer => answer.QuestionIndex == "4.3").Select(answer => answer.Value).Sum() * 100;
+            return answers.Where(answer => answer.QuestionIndex == "4.1").Select(answer => answer.Value).ConvertToDouble().Sum() /
+                   answers.Where(answer => answer.QuestionIndex == "4.3").Select(answer => answer.Value).ConvertToDouble().Sum() * 100;
         }
 
         public List<GradedApplicationDTO> GetGradedApplications()
@@ -54,7 +62,7 @@ namespace TheRealDeal.Domain.Repositories
                 .GroupJoin(_context.Grades, application => application.Id, grade => grade.ApplicationId, (application, grades) => new { ApplicationId = application.Id, Grades = grades })
                 .GroupJoin(_context.Answers, application => application.ApplicationId, answer => answer.ApplicationId, (application, answers) => new { ApplicationId = application.ApplicationId, Grades = application.Grades, Answers = answers })
                 .Where(application => application.Grades.ToList().Count == 4)
-                .Select(application => new GradedApplicationDTO(){ ApplicationId = application.ApplicationId, ProjectName = application.Answers.First(answer => answer.QuestionIndex == "1.1").Value })
+                .Select(application => new GradedApplicationDTO(){ ApplicationId = application.ApplicationId, ProjectName = application.Answers.FirstOrDefault(answer => answer.QuestionIndex == "1.1").Value })
                 .ToList();
         }  
     }
