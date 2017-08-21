@@ -36,6 +36,9 @@ namespace TheRealDeal
                     case 5:
                         applicationsRepository.GetGradedApplications().ForEach(application => Console.WriteLine(application.ProjectName));
                         break;
+                    case 6:
+                        applicationsRepository.GetRewardedApplications().ForEach(application => Console.WriteLine(application.ProjectName + " " + application.MoneyWon));
+                        break;
                 }
             } while (selection != 0);
         }

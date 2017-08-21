@@ -1,10 +1,9 @@
 ﻿namespace TheRealDeal.Domain.DTO
 {
-    public class GradedApplicationDTO
+    public class MoneyApplicationsDTO
     {
         public int ApplicationId { get; set; }
-        public int Grade { get; set; }
         public string ProjectName { get; set; }
-        public string Category { get; set; }
+        public double MoneyWon { get; set; }
     }
 }

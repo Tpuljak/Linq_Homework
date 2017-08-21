@@ -56,14 +56,31 @@ namespace TheRealDeal.Domain.Repositories
                    answers.Where(answer => answer.QuestionIndex == "4.3").Select(answer => answer.Value).ConvertToDouble().Sum() * 100;
         }
 
-        public List<GradedApplicationDTO> GetGradedApplications()
+        public List<ApplicationIdAndNameDTO> GetGradedApplications()
         {
             return _context.Applications
                 .GroupJoin(_context.Grades, application => application.Id, grade => grade.ApplicationId, (application, grades) => new { ApplicationId = application.Id, Grades = grades })
                 .GroupJoin(_context.Answers, application => application.ApplicationId, answer => answer.ApplicationId, (application, answers) => new { ApplicationId = application.ApplicationId, Grades = application.Grades, Answers = answers })
                 .Where(application => application.Grades.ToList().Count == 4)
-                .Select(application => new GradedApplicationDTO(){ ApplicationId = application.ApplicationId, ProjectName = application.Answers.FirstOrDefault(answer => answer.QuestionIndex == "1.1").Value })
+                .Select(application => new ApplicationIdAndNameDTO() { ApplicationId = application.ApplicationId, ProjectName = application.Answers.FirstOrDefault(answer => answer.QuestionIndex == "1.1").Value })
                 .ToList();
-        }  
+        }
+
+        public List<MoneyApplicationsDTO> GetRewardedApplications()
+        {
+            return _context.Applications
+                //.GroupWithGradesAndAnswers(_context)
+                 .GroupJoin(_context.Grades, application => application.Id, grade => grade.ApplicationId, (application, grades) => new {
+                     ApplicationId = application.Id,
+                     Grades = grades })
+                 .GroupJoin(_context.Answers, application => application.ApplicationId, answer => answer.ApplicationId, (application, answers) => new EntityGroupDTO() {
+                     ApplicationId = application.ApplicationId,
+                     Grades = application.Grades.ToList(),
+                     Answers = answers.ToList() })
+                 .ConvertToGraded()
+                 .OrderByDescending(application => application.Grade)
+                 .DistributeMoney()
+                 .ToList();
+        }
     }
 }
