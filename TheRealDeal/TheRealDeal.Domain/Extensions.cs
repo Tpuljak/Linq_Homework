@@ -71,6 +71,7 @@ namespace TheRealDeal.Domain
 
                 var applications = list
                     .OrderBy(app => app.Category)
+                    .ThenBy(app => app.Grade)
                     .Skip(skipIndex)
                     .TakeWhile(application => application.Grade == currMaxGrade)
                     .ToList();
@@ -85,10 +86,10 @@ namespace TheRealDeal.Domain
                 else
                 {
                     for (int j = 0; i < applications.Count; i++) {
-                        if (moneyApps.Where(app => app.ApplicationId == applications[i].ApplicationId).DefaultIfEmpty(null).First() != null)
-                            moneyApps.First(app => app.ApplicationId == applications[i].ApplicationId).MoneyWon += 30000.0 / applications.Count;
+                        if (moneyApps.Where(app => app.ApplicationId == applications[j].ApplicationId).DefaultIfEmpty(null).First() != null)
+                            moneyApps.First(app => app.ApplicationId == applications[j].ApplicationId).MoneyWon += 30000.0 / applications.Count;
                         else
-                            moneyApps.Add(new MoneyApplicationsDTO() { ProjectName = applications[i].ProjectName, ApplicationId = applications[i].ApplicationId, MoneyWon = 30000 / applications.Count });
+                            moneyApps.Add(new MoneyApplicationsDTO() { ProjectName = applications[j].ProjectName, ApplicationId = applications[j].ApplicationId, MoneyWon = 30000 / applications.Count });
                     }
                 }
 
