@@ -51,6 +51,7 @@
     <Compile Include="DTO\ApplicationIdAndNameDTO.cs" />
     <Compile Include="DTO\GradedApplicationDTO.cs" />
     <Compile Include="DTO\MoneyApplicationsDTO.cs" />
+    <Compile Include="DTO\MoneyRequestAnswersDTO.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\ApplicationsRepository.cs" />
